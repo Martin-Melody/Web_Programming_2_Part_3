@@ -14,7 +14,7 @@ import { NewSupplierComponent } from './Components/new-supplier/new-supplier.com
 // End of Components.
 
 // HTTP 
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 // End of HTTP
 
 // Angular Material
@@ -32,6 +32,14 @@ import { ConfirmationComponent } from './Components/confirmation/confirmation.co
 import { ForgotPasswordComponent } from './Components/forgot-password/forgot-password.component';
 // End of Angular Material
 
+import { AuthModule, AuthHttpInterceptor } from '@auth0/auth0-angular';
+import { NavbarComponent } from './Components/navbar/navbar.component';
+import { environment } from 'src/environments/environment';
+import { ProfileComponent } from './Components/profile/profile.component';
+
+
+
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -44,6 +52,8 @@ import { ForgotPasswordComponent } from './Components/forgot-password/forgot-pas
     SignUpComponent,
     ConfirmationComponent,
     ForgotPasswordComponent,
+    NavbarComponent,
+    ProfileComponent,
   ],
   imports: [
     BrowserModule,
@@ -57,8 +67,21 @@ import { ForgotPasswordComponent } from './Components/forgot-password/forgot-pas
     MatCheckboxModule,
     MatChipsModule,
     MatButtonModule,
+    AuthModule.forRoot({
+      ...environment.auth0,
+      httpInterceptor: {
+        allowedList: [`${environment.apiUri}suppliers`],
+      },
+    }),
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthHttpInterceptor,
+      multi: true,
+    },
+  ],
+
   bootstrap: [AppComponent],
 })
 export class AppModule {}
